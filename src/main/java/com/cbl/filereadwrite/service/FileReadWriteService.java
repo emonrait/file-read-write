@@ -221,13 +221,15 @@ public class FileReadWriteService {
             // Extract the file name from the file path
             Path sourcePath = Paths.get(filePath);
             String fileName = sourcePath.getFileName().toString();
-            System.out.println("fileName = " + sourcePath);
             // Destination directory path
             Path destinationDirectory = Paths.get("E:\\rtgs\\output\\movefile\\");
 
             // Resolve the destination file path with the same name and extension
             Path destinationFile = destinationDirectory.resolve(fileName);
-            System.out.println("destinationFile = " + destinationFile);
+            // Check if the directory exists
+            if (!Files.exists(destinationDirectory)) {
+                Files.createDirectories(destinationDirectory);
+            }
             // Move the file
             Files.move(sourcePath, destinationFile);
 
