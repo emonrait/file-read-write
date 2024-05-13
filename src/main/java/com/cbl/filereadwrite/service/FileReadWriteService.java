@@ -209,14 +209,29 @@ public class FileReadWriteService {
     private static void readAndPrintFileContents(String filePath) throws IOException, ParserConfigurationException {
         // Open the file
         try {
+
             // Create a DocumentBuilder
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
 
             // Parse the XSD or XML file
             Document doc = builder.parse(new File(filePath));
-
             System.out.println("doc = " + toString(doc));
+
+            // Extract the file name from the file path
+            Path sourcePath = Paths.get(filePath);
+            String fileName = sourcePath.getFileName().toString();
+            System.out.println("fileName = " + sourcePath);
+            // Destination directory path
+            Path destinationDirectory = Paths.get("E:\\rtgs\\output\\movefile\\");
+
+            // Resolve the destination file path with the same name and extension
+            Path destinationFile = destinationDirectory.resolve(fileName);
+            System.out.println("destinationFile = " + destinationFile);
+            // Move the file
+            Files.move(sourcePath, destinationFile);
+
+            System.out.println("File moved successfully.");
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -263,6 +278,20 @@ public class FileReadWriteService {
     private static String getCreationTime(Path file) throws IOException {
         BasicFileAttributes attr = Files.readAttributes(file, BasicFileAttributes.class);
         return attr.creationTime().toString();
+    }
+
+    private static void fileMove() {
+        // Source and destination file paths
+        Path sourcePath = Paths.get("source.txt");
+        Path destinationPath = Paths.get("destination.txt");
+
+        try {
+            // Move the file
+            Files.move(sourcePath, destinationPath);
+            System.out.println("File moved successfully.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 

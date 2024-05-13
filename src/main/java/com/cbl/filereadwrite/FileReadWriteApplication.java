@@ -10,7 +10,7 @@ import static com.cbl.filereadwrite.service.FileReadWriteService.fileReadStateme
 public class FileReadWriteApplication {
 
     public static void main(String[] args) throws Exception {
-        fileReadStatement("MANUAL");
+        fileReadStatement("MANUAL1");
         SpringApplication.run(FileReadWriteApplication.class, args);
     }
 
