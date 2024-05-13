@@ -31,14 +31,13 @@ public class ApiController {
 
     @PostMapping("/read")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<?> fileRead(@RequestParam(value = "data",required = false) String data) {
+    public ResponseEntity<?> fileRead(@RequestParam(value = "data", required = false) String data) {
         try {
-            ResponseDto response = FileReadWriteService.fileReadTrx(data);
+            ResponseDto response = FileReadWriteService.fileReadStatement(data);
             return ResponseHandler.generateResponse("Request process Successfully", HttpStatus.OK, response);
 
         } catch (Exception ex) {
             return ResponseHandler.generateResponse("Request process Failed. " + ex.getMessage(), HttpStatus.NOT_FOUND, null);
-
         }
     }
 
@@ -49,7 +48,7 @@ public class ApiController {
             ResponseDto response = fileReadWriteService.fileWrite(data);
             return ResponseHandler.generateResponse("Request process Successfully", HttpStatus.OK, response);
         } catch (Exception ex) {
-            return ResponseHandler.generateResponse("Request process Failed. "+ex.getMessage(), HttpStatus.NOT_FOUND, null);
+            return ResponseHandler.generateResponse("Request process Failed. " + ex.getMessage(), HttpStatus.NOT_FOUND, null);
 
         }
     }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0" targetNamespace="urn:swift:saa:xsd:saa.2.0"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:saa="urn:swift:saa:xsd:saa.2.0"
+           xmlns:head001="urn:iso:std:iso:20022:tech:xsd:head.001.001.01"
+           xmlns:camt018="urn:swift:xsd:camt.018.001.03">
+
+    <xs:import namespace="urn:iso:std:iso:20022:tech:xsd:head.001.001.01" schemaLocation="head.001.001.01.xsd"/>
+    <xs:import namespace="urn:swift:xsd:camt.018.001.03" schemaLocation="camt.018.001.03.BANGLADESH.xsd"/>
+
+    <xs:element name="DataPDU">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Revision" type="xs:string"/>
+                <xs:element name="Body">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="head001:AppHdr"/>
+                            <xs:choice>
+                                <xs:element ref="camt018:Document" minOccurs="0" maxOccurs="1"/>
+                            </xs:choice>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

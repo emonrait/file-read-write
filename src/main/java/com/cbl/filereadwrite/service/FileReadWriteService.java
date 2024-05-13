@@ -282,19 +282,4 @@ public class FileReadWriteService {
         return attr.creationTime().toString();
     }
 
-    private static void fileMove() {
-        // Source and destination file paths
-        Path sourcePath = Paths.get("source.txt");
-        Path destinationPath = Paths.get("destination.txt");
-
-        try {
-            // Move the file
-            Files.move(sourcePath, destinationPath);
-            System.out.println("File moved successfully.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
 }
