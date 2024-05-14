@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:swift:xsd:camt.025.001.03" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Document" type="urn:DocumentType" xmlns:urn="urn:swift:xsd:camt.025.001.03"/>
+  <xs:complexType name="MsgHdrType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="MsgId"/>
+      <xs:element type="xs:string" name="CreDtTm"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="OrgnlMsgIdType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="MsgId"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ReqHdlgType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="StsCd"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RctDtlsType">
+    <xs:sequence>
+      <xs:element type="urn:OrgnlMsgIdType" name="OrgnlMsgId" xmlns:urn="urn:swift:xsd:camt.025.001.03"/>
+      <xs:element type="urn:ReqHdlgType" name="ReqHdlg" xmlns:urn="urn:swift:xsd:camt.025.001.03"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RctType">
+    <xs:sequence>
+      <xs:element type="urn:MsgHdrType" name="MsgHdr" xmlns:urn="urn:swift:xsd:camt.025.001.03"/>
+      <xs:element type="urn:RctDtlsType" name="RctDtls" xmlns:urn="urn:swift:xsd:camt.025.001.03"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DocumentType">
+    <xs:sequence>
+      <xs:element type="urn:RctType" name="Rct" xmlns:urn="urn:swift:xsd:camt.025.001.03"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

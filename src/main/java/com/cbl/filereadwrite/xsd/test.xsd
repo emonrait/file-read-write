@@ -13,11 +13,9 @@
                 <xs:element name="Body">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element ref="head001:AppHdr"
-                                        xmlns:head001="urn:iso:std:iso:20022:tech:xsd:head.001.001.01"/>
+                            <xs:element name="AppHdr" type="urn:AppHdrType" xmlns:urn="urn:iso:std:iso:20022:tech:xsd:head.001.001.01"/>
                             <xs:choice>
-                                <xs:element ref="camt018:Document" minOccurs="0" maxOccurs="1"
-                                            xmlns:camt018="urn:swift:xsd:camt.018.001.03"/>
+                                <xs:element ref="camt018:Document" minOccurs="0" maxOccurs="1"/>
                             </xs:choice>
                         </xs:sequence>
                     </xs:complexType>

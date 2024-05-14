@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:swift:saa:xsd:saa.2.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="DataPDU" type="urn:DataPDUType" xmlns:urn="urn:swift:saa:xsd:saa.2.0"/>
+  <xs:complexType name="BodyType">
+    <xs:sequence>
+      <xs:element ref="urn:AppHdr" xmlns:urn="urn:iso:std:iso:20022:tech:xsd:head.001.001.01"/>
+      <xs:element ref="urn:Document" xmlns:urn="urn:swift:xsd:camt.025.001.03"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DataPDUType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="Revision"/>
+      <xs:element type="urn:BodyType" name="Body" xmlns:urn="urn:swift:saa:xsd:saa.2.0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
