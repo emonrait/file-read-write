@@ -12,6 +12,8 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class JAXBMarshalling {
 
@@ -49,7 +51,7 @@ public class JAXBMarshalling {
             BusinessDaySearchCriteria1 criteria11 = new BusinessDaySearchCriteria1();
             SystemEventType2Choice choice1 = new SystemEventType2Choice();
             GenericIdentification1 identification1 = new GenericIdentification1();
-            identification1.setId("RAIHAN");
+            identification1.setId("100750676");
             choice1.setPrtry(identification1);
             criteria11.setEvtTp(choice1);
             criteria1.setSchCrit(criteria11);
@@ -78,19 +80,22 @@ public class JAXBMarshalling {
             marshaller.marshal(dataPDU, doc);
 
             // Get the DataPDU element
-            Element dataPDUElement = doc.getDocumentElement();
-
-            // Remove the namespace declaration
+            Element dataPDUElement = (Element) doc.getElementsByTagNameNS("urn:swift:saa:xsd:saa.2.0", "DataPDU").item(0);
+            dataPDUElement.removeAttribute("xmlns:ns2");
             dataPDUElement.removeAttribute("xmlns:ns3");
             dataPDUElement.removeAttribute("xmlns:ns4");
+          //  dataPDUElement.setAttribute("xmlns:", "urn:swift:saa:xsd:saa.2.0");
+
 
             // Add namespace declaration to AppHdr element
-            //  Element appHdrElement = (Element) doc.getElementsByTagNameNS("urn:iso:std:iso:20022:tech:xsd:head.001.001.01", "AppHdr").item(0);
-            //  appHdrElement.setAttribute("xmlns:", "urn:iso:std:iso:20022:tech:xsd:head.001.001.01");
+          //  Element appHdrElement = (Element) doc.getElementsByTagNameNS("urn:iso:std:iso:20022:tech:xsd:head.001.001.01", "AppHdr").item(0);
+         //   appHdrElement.removeAttribute("xmlns:ns3");
+          //  appHdrElement.setAttribute("xmlns:", "urn:iso:std:iso:20022:tech:xsd:head.001.001.01");
 
             // Add namespace declaration to Documnet element
-            //   Element documentElement = (Element) doc.getElementsByTagNameNS("urn:swift:xsd:camt.018.001.03", "Document").item(0);
-            //  documentElement.setAttribute("xmlns:", "urn:swift:xsd:camt.018.001.03");
+            //Element documentElement = (Element) doc.getElementsByTagNameNS("urn:swift:xsd:camt.018.001.03", "Document").item(0);
+           // appHdrElement.removeAttribute("xmlns:ns4");
+           // documentElement.setAttribute("xmlns:", "urn:swift:xsd:camt.018.001.03");
 
             // Transform DOM to String
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -144,7 +149,7 @@ public class JAXBMarshalling {
             javax.xml.transform.stream.StreamResult sr = new javax.xml.transform.stream.StreamResult(sw);
             javax.xml.transform.dom.DOMSource domSource = new javax.xml.transform.dom.DOMSource(document);
             transformer.transform(domSource, sr);
-            return removeXmlStringNamespaceAndPreamble(sw.toString());
+            return replaceNamespacePrefix(sw.toString());
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -157,6 +162,21 @@ public class JAXBMarshalling {
                 // .  replaceAll("xmlns.*?(\"|\').*?(\"|\')", "") /* remove xmlns declaration */
                 .replaceAll("(<)(\\w+:)(.*?>)", "$1$3") /* remove opening tag prefix */
                 .replaceAll("(</)(\\w+:)(.*?>)", "$1$3"); /* remove closing tags prefix */
+    }
+
+    private static String replaceNamespacePrefix(String xml) {
+
+        Pattern pattern = Pattern.compile("xmlns:\\w+");
+        Matcher matcher = pattern.matcher(removeXmlStringNamespaceAndPreamble(xml));
+
+        StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            String replacement = "xmlns";
+            matcher.appendReplacement(sb, replacement);
+        }
+        matcher.appendTail(sb);
+
+        return sb.toString();
     }
 }
 
