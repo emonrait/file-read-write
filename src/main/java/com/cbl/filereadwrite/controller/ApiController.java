@@ -31,9 +31,9 @@ public class ApiController {
 
     @PostMapping("/read")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<?> fileRead(@RequestParam(value = "data", required = false) String data) {
+    public ResponseEntity<?> fileRead(@RequestParam(value = "readType", required = false) String readType) {
         try {
-            ResponseDto response = FileReadWriteService.fileReadStatement(data);
+            ResponseDto response = FileReadWriteService.fileReadStatement(readType);
             return ResponseHandler.generateResponse("Request process Successfully", HttpStatus.OK, response);
 
         } catch (Exception ex) {
@@ -43,9 +43,21 @@ public class ApiController {
 
     @PostMapping("/write")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<?> fileWrite(@RequestParam(value = "data") String data) {
+    public ResponseEntity<?> fileWrite(@RequestParam(value = "data") String data, @RequestParam(value = "fileName") String fileName) {
         try {
-            ResponseDto response = fileReadWriteService.fileWrite(data);
+            ResponseDto response = FileReadWriteService.fileWrite(data, fileName);
+            return ResponseHandler.generateResponse("Request process Successfully", HttpStatus.OK, response);
+        } catch (Exception ex) {
+            return ResponseHandler.generateResponse("Request process Failed. " + ex.getMessage(), HttpStatus.NOT_FOUND, null);
+
+        }
+    }
+
+    @PostMapping("/write-outward")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> fileWriteForOutWard(@RequestParam(value = "data") String data, @RequestParam(value = "fileName") String fileName) {
+        try {
+            ResponseDto response = FileReadWriteService.fileWriteForOutWard(data, fileName);
             return ResponseHandler.generateResponse("Request process Successfully", HttpStatus.OK, response);
         } catch (Exception ex) {
             return ResponseHandler.generateResponse("Request process Failed. " + ex.getMessage(), HttpStatus.NOT_FOUND, null);

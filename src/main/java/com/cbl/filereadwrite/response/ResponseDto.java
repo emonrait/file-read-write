@@ -9,5 +9,4 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ResponseDto {
     private String responseData = "";
-    private Object dataObject = "";
 }

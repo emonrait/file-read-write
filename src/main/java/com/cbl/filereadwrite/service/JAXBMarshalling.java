@@ -84,18 +84,18 @@ public class JAXBMarshalling {
             dataPDUElement.removeAttribute("xmlns:ns2");
             dataPDUElement.removeAttribute("xmlns:ns3");
             dataPDUElement.removeAttribute("xmlns:ns4");
-          //  dataPDUElement.setAttribute("xmlns:", "urn:swift:saa:xsd:saa.2.0");
+            //  dataPDUElement.setAttribute("xmlns:", "urn:swift:saa:xsd:saa.2.0");
 
 
             // Add namespace declaration to AppHdr element
-          //  Element appHdrElement = (Element) doc.getElementsByTagNameNS("urn:iso:std:iso:20022:tech:xsd:head.001.001.01", "AppHdr").item(0);
-         //   appHdrElement.removeAttribute("xmlns:ns3");
-          //  appHdrElement.setAttribute("xmlns:", "urn:iso:std:iso:20022:tech:xsd:head.001.001.01");
+            //  Element appHdrElement = (Element) doc.getElementsByTagNameNS("urn:iso:std:iso:20022:tech:xsd:head.001.001.01", "AppHdr").item(0);
+            //   appHdrElement.removeAttribute("xmlns:ns3");
+            //  appHdrElement.setAttribute("xmlns:", "urn:iso:std:iso:20022:tech:xsd:head.001.001.01");
 
             // Add namespace declaration to Documnet element
             //Element documentElement = (Element) doc.getElementsByTagNameNS("urn:swift:xsd:camt.018.001.03", "Document").item(0);
-           // appHdrElement.removeAttribute("xmlns:ns4");
-           // documentElement.setAttribute("xmlns:", "urn:swift:xsd:camt.018.001.03");
+            // appHdrElement.removeAttribute("xmlns:ns4");
+            // documentElement.setAttribute("xmlns:", "urn:swift:xsd:camt.018.001.03");
 
             // Transform DOM to String
             Transformer transformer = TransformerFactory.newInstance().newTransformer();

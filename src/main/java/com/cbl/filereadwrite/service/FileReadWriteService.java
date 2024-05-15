@@ -3,8 +3,13 @@ package com.cbl.filereadwrite.service;
 import com.cbl.filereadwrite.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -15,6 +20,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.*;
@@ -22,12 +28,14 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class FileReadWriteService {
 
+    static int count = 0;
 
     public static ResponseDto fileReadTrx(String filename) throws Exception {
         ResponseDto outModel = new ResponseDto();
@@ -131,7 +139,7 @@ public class FileReadWriteService {
         Path folder1 = Path.of("E:\\rtgs\\output\\txn\\");
         Path folder2 = Path.of("E:\\rtgs\\output\\additional\\");
         Path folder3 = Path.of("E:\\rtgs\\output\\statement\\");
-
+        // TimeUnit.SECONDS.sleep(1);
         // Create a WatchService
         WatchService watchService = FileSystems.getDefault().newWatchService();
 
@@ -200,11 +208,71 @@ public class FileReadWriteService {
     }
 
 
-    public ResponseDto fileWrite(String data) throws Exception {
+    public static ResponseDto fileWrite(String data, String fileName) {
         ResponseDto outModel = new ResponseDto();
         String processData = "";
+        Path folder1 = Path.of("E:\\rtgs\\output\\txn\\");
+        Path folder2 = Path.of("E:\\rtgs\\output\\additional\\");
+        Path folder3 = Path.of("E:\\rtgs\\output\\statement\\");
+        // Specify the folder and file name
+        // Create the file object
+        File file = null;
+        if (data.contains("pacs.008.001.04") || data.contains("pacs.009.001.04") || data.contains("pacs.004.001.04")) {
+            file = new File(folder1 + "/" + fileName + ".xml");
+        } else if (data.contains("pacs.002.001.04") || data.contains("camt.054.001.04") || data.contains("camt.025.001.04") || data.contains("camt.019.001.04")) {
+            file = new File(folder2 + "/" + fileName + ".xml");
+        } else if (data.contains("camt.52.001.04") || data.contains("camt.53.001.04")) {
+            file = new File(folder3 + "/" + fileName + ".xml");
+        } else {
+            throw new RuntimeException("Invalid File or Data.");
+        }
+
+        try {
+            // Create the directories if they don't exist
+            Path parentDirectory = file.toPath().getParent();
+            if (!Files.exists(parentDirectory)) {
+                Files.createDirectories(parentDirectory);
+            }
+
+            // Write the content to the file
+            FileWriter writer = new FileWriter(file);
+            writer.write(data);
+            writer.close();
+
+            System.out.println("File written successfully.");
+        } catch (IOException e) {
+            System.out.println("An error occurred while writing the file.");
+            e.printStackTrace();
+        }
         return outModel;
     }
+
+
+    public static ResponseDto fileWriteForOutWard(String data, String fileName) {
+        ResponseDto outModel = new ResponseDto();
+        String processData = "";
+        Path folder1 = Path.of("E:\\rtgs\\input\\");
+        // Specify the folder and file name
+        // Create the file object
+        File file = null;
+        file = new File(folder1 + "/" + fileName + ".xml");
+        try {
+            // Create the directories if they don't exist
+            //  file.getParentFile().mkdirs();
+
+            // Write the content to the file
+            FileWriter writer = new FileWriter(file);
+            writer.write(data);
+            writer.close();
+
+            System.out.println("File written successfully.");
+        } catch (IOException e) {
+            System.out.println("An error occurred while writing the file.");
+            e.printStackTrace();
+        }
+        return outModel;
+    }
+
 
     private static void readAndPrintFileContents(String filePath) throws IOException, ParserConfigurationException {
         // Open the file
@@ -216,8 +284,8 @@ public class FileReadWriteService {
 
             // Parse the XSD or XML file
             Document doc = builder.parse(new File(filePath));
-            System.out.println("doc = " + toString(doc));
-
+            // System.out.println("doc = " + toString(doc));
+            String data = toString(doc);
             // Extract the file name from the file path
             Path sourcePath = Paths.get(filePath);
             String fileName = sourcePath.getFileName().toString();
@@ -234,10 +302,37 @@ public class FileReadWriteService {
             Files.move(sourcePath, destinationFile);
 
             System.out.println("File moved successfully.");
+            if (!data.isEmpty()) {
+                //Manual process call
+                String url = "http://172.25.6.92:8085/test/inward-process-data";
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+               // headers.setBearerAuth("6869f660bce14d1a958e16a0bc6f4408");
+                headers.setBearerAuth("6869f660bce14d1a958e16a0bc6f4408");
 
-        } catch (Exception ex) {
+                MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+                map.add("data", data);
+
+                HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+
+                RestTemplate restTemplate = new RestTemplate();
+                ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
+                if (response.getStatusCode() == HttpStatus.OK) {
+                    System.out.println("Request processed successfully");
+                } else {
+                    System.out.println("Request failed: " + response.getBody());
+                }
+
+            }
+
+
+        } catch (SAXException ex) {
+            count++;
+            System.out.println("count = " + count);
             ex.printStackTrace();
         }
+        System.out.println("count = " + count);
     }
 
     public static String toString(Document doc) {
@@ -268,9 +363,11 @@ public class FileReadWriteService {
                 for (Path path : directoryStream) {
                     BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
                     Instant creationTime = attr.creationTime().toInstant();
-                    if (creationTime.isAfter(now.minusSeconds(60))) { // Adjust the time frame as needed
-                        newFiles.add(path);
-                    }
+//                    if (creationTime.isAfter(now.minusSeconds(60))) { // Adjust the time frame as needed
+//                        newFiles.add(path);
+//                    }
+
+                    newFiles.add(path);
                 }
             }
         }
