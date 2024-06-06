@@ -1,7 +1,7 @@
 package com.cbl.filereadwrite.service;
 
 
-import com.cbl.filereadwrite.service.camt_018.*;
+import com.cbl.filereadwrite.service.camt_018.DataPDU;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -15,53 +15,10 @@ import javax.xml.transform.dom.DOMSource;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class JAXBMarshalling {
+public class JAXBMarshallingPacs008 {
 
     public static void main(String[] args) {
         try {
-
-            DataPDU dataPDU = new DataPDU();
-            dataPDU.setRevision("2.0.5");
-            DataPDU.Body body = new DataPDU.Body();
-            BusinessApplicationHeaderV01 headerV01 = new BusinessApplicationHeaderV01();
-            headerV01.setBizMsgIdr("240508BBHOBDDHARTG0001556240");
-            Party9Choice party9Choice = new Party9Choice();
-            BranchAndFinancialInstitutionIdentification5 identification5 = new BranchAndFinancialInstitutionIdentification5();
-            FinancialInstitutionIdentification8 identification8 = new FinancialInstitutionIdentification8();
-            identification8.setBICFI("BBHOBDDH");
-            identification5.setFinInstnId(identification8);
-            party9Choice.setFIId(identification5);
-            headerV01.setFr(party9Choice);
-            headerV01.setBizSvc("RTGS_CSCT");
-            headerV01.setMsgDefIdr("camt.018.001.04");
-            Party9Choice party9ChoiceTo = new Party9Choice();
-            BranchAndFinancialInstitutionIdentification5 identification51 = new BranchAndFinancialInstitutionIdentification5();
-            FinancialInstitutionIdentification8 identification81 = new FinancialInstitutionIdentification8();
-            identification81.setBICFI("CIBLBDDH");
-            identification51.setFinInstnId(identification81);
-            party9ChoiceTo.setFIId(identification51);
-            headerV01.setTo(party9ChoiceTo);
-
-            // headerV01.setCreDt();
-            com.cbl.filereadwrite.service.camt_018.Document document = new com.cbl.filereadwrite.service.camt_018.Document();
-            GetBusinessDayInformationV03CMA v03CMA = new GetBusinessDayInformationV03CMA();
-            BusinessDayQuery1CMA query1CMA = new BusinessDayQuery1CMA();
-            BusinessDayCriteria2Choice choice = new BusinessDayCriteria2Choice();
-            BusinessDayCriteria1 criteria1 = new BusinessDayCriteria1();
-            BusinessDaySearchCriteria1 criteria11 = new BusinessDaySearchCriteria1();
-            SystemEventType2Choice choice1 = new SystemEventType2Choice();
-            GenericIdentification1 identification1 = new GenericIdentification1();
-            identification1.setId("100750676");
-            choice1.setPrtry(identification1);
-            criteria11.setEvtTp(choice1);
-            criteria1.setSchCrit(criteria11);
-            choice.setNewCrit(criteria1);
-            query1CMA.setCrit(choice);
-            v03CMA.setBizDayInfQryDef(query1CMA);
-            document.setGetBizDayInf(v03CMA);
-            body.setDocument(document);
-            body.setAppHdr(headerV01);
-            dataPDU.setBody(body);
 
             // Step 1: Marshalling
             // Create JAXB context for Employee class
@@ -77,7 +34,7 @@ public class JAXBMarshalling {
             // Marshal to DOM
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             Document doc = dbf.newDocumentBuilder().newDocument();
-            marshaller.marshal(dataPDU, doc);
+         //   marshaller.marshal(dataPDU, doc);
 
             // Get the DataPDU element
             Element dataPDUElement = (Element) doc.getElementsByTagNameNS("urn:swift:saa:xsd:saa.2.0", "DataPDU").item(0);
@@ -147,7 +104,7 @@ public class JAXBMarshalling {
 
             java.io.StringWriter sw = new java.io.StringWriter();
             javax.xml.transform.stream.StreamResult sr = new javax.xml.transform.stream.StreamResult(sw);
-            javax.xml.transform.dom.DOMSource domSource = new javax.xml.transform.dom.DOMSource(document);
+            DOMSource domSource = new DOMSource(document);
             transformer.transform(domSource, sr);
             return replaceNamespacePrefix(sw.toString());
         } catch (Exception e) {

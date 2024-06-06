@@ -1,10 +1,10 @@
 
 package com.cbl.filereadwrite.service.pacs_008;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -37,10 +37,14 @@ import jakarta.xml.bind.annotation.XmlType;
 public class GarnishmentType1Choice1 {
 
     /**
-     * Garnishment type in a coded form.
-     *                         Would suggest this to be an External Code List to contain:
-     *                         GNCS    Garnishment from a third party payer for Child Support
-     *                         GNDP    Garnishment from a Direct Payer for Child Support
+     * Garnishment type in a coded form.
+
+     *                         Would suggest this to be an External Code List to contain:
+
+     *                         GNCS    Garnishment from a third party payer for Child Support
+
+     *                         GNDP    Garnishment from a Direct Payer for Child Support
+
      *                         GTPP     Garnishment from a third party payer to taxing agency.
      * 
      */
@@ -54,10 +58,14 @@ public class GarnishmentType1Choice1 {
     protected String prtry;
 
     /**
-     * Garnishment type in a coded form.
-     *                         Would suggest this to be an External Code List to contain:
-     *                         GNCS    Garnishment from a third party payer for Child Support
-     *                         GNDP    Garnishment from a Direct Payer for Child Support
+     * Garnishment type in a coded form.
+
+     *                         Would suggest this to be an External Code List to contain:
+
+     *                         GNCS    Garnishment from a third party payer for Child Support
+
+     *                         GNDP    Garnishment from a Direct Payer for Child Support
+
      *                         GTPP     Garnishment from a third party payer to taxing agency.
      * 
      * @return

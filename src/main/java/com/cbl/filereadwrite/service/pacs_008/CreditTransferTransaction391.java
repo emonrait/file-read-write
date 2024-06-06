@@ -5,11 +5,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.datatype.XMLGregorianCalendar;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlSchemaType;
-import jakarta.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -175,7 +175,8 @@ public class CreditTransferTransaction391 {
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar accptncDtTm;
     /**
-     * Amount of money to be moved between the debtor and creditor, before deduction of charges, expressed in the currency as ordered by the initiating party.
+     * Amount of money to be moved between the debtor and creditor, before deduction of charges, expressed in the currency as ordered by the initiating party.
+
      *                         Usage: This amount has to be transported unchanged through the transaction chain.
      * 
      */
@@ -599,7 +600,8 @@ public class CreditTransferTransaction391 {
     }
 
     /**
-     * Amount of money to be moved between the debtor and creditor, before deduction of charges, expressed in the currency as ordered by the initiating party.
+     * Amount of money to be moved between the debtor and creditor, before deduction of charges, expressed in the currency as ordered by the initiating party.
+
      *                         Usage: This amount has to be transported unchanged through the transaction chain.
      * 
      * @return

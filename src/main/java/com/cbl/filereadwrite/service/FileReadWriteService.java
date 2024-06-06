@@ -7,9 +7,9 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,11 +24,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -139,7 +138,6 @@ public class FileReadWriteService {
         Path folder1 = Path.of("E:\\rtgs\\output\\txn\\");
         Path folder2 = Path.of("E:\\rtgs\\output\\additional\\");
         Path folder3 = Path.of("E:\\rtgs\\output\\statement\\");
-        // TimeUnit.SECONDS.sleep(1);
         // Create a WatchService
         WatchService watchService = FileSystems.getDefault().newWatchService();
 
@@ -155,12 +153,14 @@ public class FileReadWriteService {
                 List<Path> newFiles = checkForNewFiles(folder1, folder2, folder3);
                 if (!newFiles.isEmpty()) {
                     // Handle new files
-                    System.out.println("New files detected:");
+                    //   System.out.println("New files detected:");
                     for (Path file : newFiles) {
                         System.out.println(file);
-                        // Check file creation time
+                        // Read The File
                         readAndPrintFileContents(file.toString());
                     }
+                } else {
+                    throw new RuntimeException("No File Found.");
                 }
                 break;
             }
@@ -238,11 +238,10 @@ public class FileReadWriteService {
             FileWriter writer = new FileWriter(file);
             writer.write(data);
             writer.close();
-
             System.out.println("File written successfully.");
         } catch (IOException e) {
-            System.out.println("An error occurred while writing the file.");
             e.printStackTrace();
+            throw new RuntimeException("An error occurred while writing the file.");
         }
         return outModel;
     }
@@ -269,6 +268,7 @@ public class FileReadWriteService {
         } catch (IOException e) {
             System.out.println("An error occurred while writing the file.");
             e.printStackTrace();
+            throw new RuntimeException("An error occurred while writing the file.");
         }
         return outModel;
     }
@@ -277,38 +277,50 @@ public class FileReadWriteService {
     private static void readAndPrintFileContents(String filePath) throws IOException, ParserConfigurationException {
         // Open the file
         try {
-
             // Create a DocumentBuilder
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
 
             // Parse the XSD or XML file
             Document doc = builder.parse(new File(filePath));
-            // System.out.println("doc = " + toString(doc));
             String data = toString(doc);
+            System.out.println("data = " + data);
+
             // Extract the file name from the file path
             Path sourcePath = Paths.get(filePath);
             String fileName = sourcePath.getFileName().toString();
-            // Destination directory path
-            Path destinationDirectory = Paths.get("E:\\rtgs\\output\\movefile\\");
 
-            // Resolve the destination file path with the same name and extension
+            // Destination directories
+            Path destinationDirectory = Paths.get("E:\\rtgs\\output\\movefile\\");
+            Path dbSuccess = Paths.get("E:\\rtgs\\output\\dbsuccess\\");
+            Path dbFail = Paths.get("E:\\rtgs\\output\\dbfail\\");
+
+            // Resolve the destination file paths
             Path destinationFile = destinationDirectory.resolve(fileName);
+            Path dbSuccessFile = dbSuccess.resolve(fileName);
+            Path dbFailFile = dbFail.resolve(fileName);
+
             // Check if the directory exists
             if (!Files.exists(destinationDirectory)) {
                 Files.createDirectories(destinationDirectory);
             }
+            if (!Files.exists(dbSuccess)) {
+                Files.createDirectories(dbSuccess);
+            }
+            if (!Files.exists(dbFail)) {
+                Files.createDirectories(dbFail);
+            }
+
             // Move the file
             Files.move(sourcePath, destinationFile);
 
-            System.out.println("File moved successfully.");
             if (!data.isEmpty()) {
-                //Manual process call
-                String url = "http://172.25.6.92:8085/test/inward-process-data";
+                System.out.println("data = " + data);
+                // DB Insert Api Call
+                String url = "http://172.25.6.150:8085/test/inward-process-data";
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-               // headers.setBearerAuth("6869f660bce14d1a958e16a0bc6f4408");
-                headers.setBearerAuth("6869f660bce14d1a958e16a0bc6f4408");
+                headers.setBearerAuth("208e640c601347f0861936d3da606bf6");
 
                 MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
                 map.add("data", data);
@@ -316,33 +328,64 @@ public class FileReadWriteService {
                 HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
                 RestTemplate restTemplate = new RestTemplate();
-                ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+                try {
+                    ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
 
-                if (response.getStatusCode() == HttpStatus.OK) {
-                    System.out.println("Request processed successfully");
-                } else {
-                    System.out.println("Request failed: " + response.getBody());
+                    if (response.getStatusCode() == HttpStatus.OK) {
+                        // Move the file after db success
+                        Files.copy(destinationFile, dbSuccessFile);
+                        System.out.println("Request processed successfully");
+                    } else {
+                        Files.copy(destinationFile, dbFailFile);
+                        System.out.println("Request failed: " + response.getBody());
+                    }
+                } catch (HttpClientErrorException e) {
+                    if (e.getStatusCode() == HttpStatus.CONFLICT) {
+                        System.out.println("Conflict error: " + e.getResponseBodyAsString());
+                    } else {
+                        System.out.println("Client error: " + e.getResponseBodyAsString());
+                    }
+                    Files.copy(destinationFile, dbFailFile);
+                } catch (Exception e) {
+                    System.out.println("An error occurred while making the API call.");
+                    e.printStackTrace();
+                    Files.copy(destinationFile, dbFailFile);
                 }
-
             }
 
-
-        } catch (SAXException ex) {
+        } catch (Exception ex) {
             count++;
-            System.out.println("count = " + count);
+            System.out.println("Count: " + count);
             ex.printStackTrace();
         }
-        System.out.println("count = " + count);
     }
+
+//    public static String toString(Document doc) {
+//        try {
+//            StringWriter sw = new StringWriter();
+//            TransformerFactory tf = TransformerFactory.newInstance();
+//            Transformer transformer = tf.newTransformer();
+//            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+//            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+//            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+//            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+//
+//            transformer.transform(new DOMSource(doc), new StreamResult(sw));
+//            return sw.toString();
+//        } catch (Exception ex) {
+//            throw new RuntimeException("Error converting to String", ex);
+//        }
+//    }
 
     public static String toString(Document doc) {
         try {
             StringWriter sw = new StringWriter();
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer transformer = tf.newTransformer();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"); // Exclude XML declaration
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2"); // Pretty print indentation
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 
             transformer.transform(new DOMSource(doc), new StreamResult(sw));
@@ -350,9 +393,8 @@ public class FileReadWriteService {
         } catch (Exception ex) {
             throw new RuntimeException("Error converting to String", ex);
         }
-
-
     }
+
 
     private static List<Path> checkForNewFiles(Path... folders) throws IOException {
         List<Path> newFiles = new ArrayList<>();
