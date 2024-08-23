@@ -7,3 +7,7 @@
 - Create folder C:\Logs
 - Execute the following in cmd (run as administrator)
 	sc start CreditCardStatementSynch
+
+
+netstat -aon | findstr :7008
+taskkill /F /PID 1234
