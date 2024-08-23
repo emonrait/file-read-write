@@ -1,0 +1,9 @@
+- Copy the folder to C:\Program Files
+- Execute the following in cmd (run as administrator)
+	sc create CreditCardStatementSynch binPath= "C:\Program Files\CreditCardSynchService\CreditCardStatementFileSynchronization.exe" DisplayName= "Credit Card Statement Synchronization" start= auto
+	sc description CreditCardStatementSynch "Credit Card Statement Synchronization"
+	sc failure CreditCardStatementSynch reset= 180 actions= restart/0/restart/5000/restart/30000
+
+- Create folder C:\Logs
+- Execute the following in cmd (run as administrator)
+	sc start CreditCardStatementSynch
